@@ -1,4 +1,3 @@
-import { Analytics } from "@vercel/analytics/react"
 import React, { useEffect, useRef, useState } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import {
@@ -832,6 +831,7 @@ function ResultCard({ tool, data, onCopy, copied }) {
       {data.top_3?.map((item) => (
         <MiniBar key={item.label} label={item.label} value={item.confidence} />
       ))}
+      <Analytics />
     </div>
   );
 }
