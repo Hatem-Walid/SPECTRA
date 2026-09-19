@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import {
   extractFields,
   predictInsurance,
@@ -718,6 +719,7 @@ export default function App() {
           )}
         </div>
       )}
+      <Analytics />
     </div>
   );
 }
