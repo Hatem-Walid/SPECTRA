@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react"
 import React, { useEffect, useRef, useState } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import {
