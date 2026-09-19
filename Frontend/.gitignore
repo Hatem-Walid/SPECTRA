@@ -1,0 +1,13 @@
+# المفاتيح والبيئات الحساسة
+.env
+.env.local
+
+# مجلدات المشاريع
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+
+# الموديلات الثقيلة لو تجاوزت 100 ميجا
+saved_models/*.h5

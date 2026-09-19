@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <!-- عنوان المنصة الفخم -->
+    <title>Spectra — Multi-Model AI Console</title>
+    
+    <!-- وصف احترافي للـ SEO والمشاركة -->
+    <meta name="description" content="Spectra is a unified, intelligent multi-task AI console integrating Computer Vision, Cybersecurity Intrusion Detection, and Predictive Healthcare Analytics." />
+    <meta name="theme-color" content="#07080d" />
+
+    <!-- شعار فكتور مدمج عالي الدقة (SVG Favicon) يضيء في المتصفح ويمنع 404 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='g' cx='35%25' cy='30%25' r='60%25'><stop offset='0%25' stop-color='%23b9c6ff'/><stop offset='45%25' stop-color='%236c8cff'/><stop offset='80%25' stop-color='%232c3570'/><stop offset='100%25' stop-color='%230b0d15'/></radialGradient></defs><circle cx='50' cy='50' r='46' fill='url(%23g)' stroke='%23d4af6a' stroke-width='2' stroke-opacity='0.4'/><path d='M62 38c-2-4-7-6-13-6-10 0-16 6-16 13 0 13 26 8 26 21 0 8-7 14-17 14-8 0-14-3-17-9m-4-26l2 2' fill='none' stroke='white' stroke-width='6' stroke-linecap='round'/></svg>" />
+
+    <!-- تحميل مسبق لأرقى الخطوط العالمية: Fraunces للعناوين و Inter للأزرار والقوائم -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,550;9..144,650&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- محرك Tailwind CSS مع إعدادات ألوان Spectra المخصصة -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              spectra: {
+                bg: '#07080d',
+                card: '#0e111a',
+                dock: '#0b0d15',
+                accent: '#6c8cff',
+                glow: '#b9c6ff',
+                gold: '#d4af6a',
+              }
+            },
+            fontFamily: {
+              display: ['Fraunces', 'serif'],
+              ui: ['Inter', 'system-ui', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      /* منع أي وميض أبيض أثناء فتح المتصفح */
+      html, body {
+        background-color: #07080d;
+        color: #eef0f7;
+        overflow: hidden;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        user-select: none;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* تخصيص لون التحديد عند تظليل أي كلمة بالماوس باللون الأزرق الكهربائي */
+      ::selection {
+        background: rgba(108, 140, 255, 0.35);
+        color: #ffffff;
+      }
+    </style>
+  </head>
+  <body class="bg-[#07080d] antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
