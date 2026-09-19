@@ -31,16 +31,23 @@ from models import (
     predict_leaf,
 )
 
-app = FastAPI(title="ml-models-ui backend")
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
+app = FastAPI()
+
+# تصريح المرور الشامل لجميع الروابط ورابط فيرسل
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=".*",
+    allow_origins=[
+        "https://spectra-eta-ashy.vercel.app",
+        "http://localhost:5173",
+        "*"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.get("/health")
 def health():
