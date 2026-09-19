@@ -1,7 +1,7 @@
 // الكود يختار السيرفر أوتوماتيكياً حسب مكان التشغيل:
 const FASTAPI_URL = import.meta.env.DEV
   ? "http://localhost:8000"                             // 💻 يشتغل على الكمبيوتر المحلي تلقائياً
-  : "https://spectra-backend-eight.vercel.app/";    // 🌐 يشتغل على السيرفر الأونلاين تلقائياً
+  : "https://spectra-backend-eight.vercel.app";    // 🌐 يشتغل على السيرفر الأونلاين تلقائياً
 // قراءة المفتاح بأمان من ملف .env
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
