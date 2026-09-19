@@ -831,7 +831,6 @@ function ResultCard({ tool, data, onCopy, copied }) {
       {data.top_3?.map((item) => (
         <MiniBar key={item.label} label={item.label} value={item.confidence} />
       ))}
-      <Analytics />
     </div>
   );
 }
