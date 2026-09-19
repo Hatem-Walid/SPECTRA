@@ -2,10 +2,11 @@ fastapi
 uvicorn
 numpy
 pandas
-scikit-learn
+scikit-learn==1.6.1
 joblib
 dill
 pillow
 python-multipart
 requests
 python-dotenv
+tensorflow
