@@ -18,7 +18,7 @@ INSURANCE_MODEL_PATH = os.path.join(SAVED_MODELS_DIR, "insurance_nn.keras")
 INSURANCE_FALLBACK_JOBLIB = os.path.join(SAVED_MODELS_DIR, "insurance_model.joblib")
 
 INTRUSION_MODEL_PATH = os.path.join(SAVED_MODELS_DIR, "best_rf_pipeline.joblib")
-LEAF_MODEL_PATH = os.path.join(SAVED_MODELS_DIR, "leaf_model.h5")
+LEAF_MODEL_PATH = os.path.join(SAVED_MODELS_DIR, "leaf_model.keras")
 
 _LEAF_CLASSES = [
     "Bacterial Spot",
