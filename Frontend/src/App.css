@@ -1,3 +1,326 @@
+/* ==========================================================================
+   Design tokens — "console / lab dashboard" concept
+
+   Dark, minimalist, single gold/brass accent. Functional colors are used
+   only for prediction verdicts (success/danger), never as decoration.
+   ========================================================================== */
+
+:root {
+  --bg: #0b0b0d;
+  --surface: #16161a;
+  --border: #242429;
+  --text-primary: #f2f1ed;
+  --text-muted: #8b8b93;
+  --accent: #c9a227;
+  --accent-dim: #9c7f1f;
+  --success: #34d399;
+  --danger: #f87171;
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   GLOBAL PAGE / SCROLL
+   ========================================================================== */
+
+html,
+body,
+#root {
+  min-height: 100%;
+  height: auto;
+}
+
+html {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+
+  /* Enable normal browser scrolling */
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Visible keyboard focus everywhere — required for accessibility */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   SHARED LAYOUT
+   ========================================================================== */
+
+/*
+   Keep the dashboard layout isolated.
+
+   Landing / ScrollExpand should NOT be placed inside .app-shell
+   because .app-shell intentionally uses an internal dashboard scroll.
+*/
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 40px;
+}
+
+/* ==========================================================================
+   FORM PRIMITIVES
+   ========================================================================== */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.field input,
+.field select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--accent);
+}
+
+/* auto-filled by the extraction layer, still editable */
+
+.field-filled input,
+.field-filled select {
+  border-color: var(--accent-dim);
+}
+
+/* left blank by extraction — needs the user's input */
+
+.field-missing input,
+.field-missing select {
+  border-color: var(--danger);
+}
+
+.field-missing .field-hint {
+  color: var(--danger);
+  font-size: 12px;
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: var(--accent-dim);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+/* ==========================================================================
+   LANDING — HERO NAV / CTA (ScrollExpand overlay content)
+   ========================================================================== */
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 6%;
+  mix-blend-mode: difference;
+  color: #fff;
+}
+
+.nav__brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-size: 1.05rem;
+}
+
+.nav__links {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.875rem;
+  opacity: 0.85;
+}
+
+.nav__links a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.overlay-cta {
+  color: #fff;
+}
+
+.overlay-cta h2 {
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+  margin: 0 0 0.75rem;
+}
+
+.overlay-cta p {
+  max-width: 40ch;
+  margin: 0 auto;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+
+.cta-button {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.cta-button:hover {
+  background: var(--accent-dim);
+}
+
+/* ==========================================================================
+   LANDING — EDITORIAL SECTION (heading + tags above a framed video)
+   ========================================================================== */
+
+.editorial-section {
+  background: #f6efe4;
+  padding: 2rem 6% 2rem;
+}
+
+.editorial-heading {
+  position: relative;
+  max-width: 780px;
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+
+.editorial-heading h2 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  line-height: 1.15;
+  color: #241f1a;
+  margin: 0;
+}
+
+.editorial-tag {
+  position: absolute;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.editorial-tag--gold {
+  background: var(--accent);
+  color: #241f1a;
+  top: -1.6rem;
+  left: 48%;
+}
+
+.editorial-tag--terracotta {
+  background: #c07a52;
+  color: #fdf6ec;
+  top: 42%;
+  right: -2%;
+}
+
+.editorial-tag--white {
+  background: #fdf6ec;
+  color: #241f1a;
+  bottom: -1.2rem;
+  left: 18%;
+}
+
+.editorial-media {
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 480px;
+  border-radius: 48px;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   VITE / STARTER STYLES
+   ========================================================================== */
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;
@@ -7,54 +330,67 @@
   border: 2px solid transparent;
   transition: border-color 0.3s;
   margin-bottom: 24px;
+}
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+.counter:hover {
+  border-color: var(--accent-border);
+}
+
+.counter:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .hero {
   position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
 }
+
+.hero .base,
+.hero .framework,
+.hero .vite {
+  inset-inline: 0;
+  margin: 0 auto;
+}
+
+.hero .base {
+  width: 170px;
+  position: relative;
+  z-index: 0;
+}
+
+.hero .framework,
+.hero .vite {
+  position: absolute;
+}
+
+.hero .framework {
+  z-index: 1;
+  top: 34px;
+  height: 28px;
+  transform:
+    perspective(2000px)
+    rotateZ(300deg)
+    rotateX(44deg)
+    rotateY(39deg)
+    scale(1.4);
+}
+
+.hero .vite {
+  z-index: 0;
+  top: 107px;
+  height: 26px;
+  width: auto;
+  transform:
+    perspective(2000px)
+    rotateZ(300deg)
+    rotateX(40deg)
+    rotateY(39deg)
+    scale(0.8);
+}
+
+/* ==========================================================================
+   CENTER
+   ========================================================================== */
 
 #center {
   display: flex;
@@ -63,46 +399,65 @@
   place-content: center;
   place-items: center;
   flex-grow: 1;
+}
 
-  @media (max-width: 1024px) {
+@media (max-width: 1024px) {
+  #center {
     padding: 32px 20px 24px;
     gap: 18px;
   }
 }
 
+/* ==========================================================================
+   NEXT STEPS
+   ========================================================================== */
+
 #next-steps {
   display: flex;
   border-top: 1px solid var(--border);
   text-align: left;
+}
 
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
+#next-steps > div {
+  flex: 1 1 0;
+  padding: 32px;
+}
 
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
+#next-steps .icon {
+  margin-bottom: 16px;
+  width: 22px;
+  height: 22px;
+}
 
-  @media (max-width: 1024px) {
+@media (max-width: 1024px) {
+  #next-steps {
     flex-direction: column;
     text-align: center;
   }
+
+  #next-steps > div {
+    padding: 24px 20px;
+  }
 }
+
+/* ==========================================================================
+   DOCS
+   ========================================================================== */
 
 #docs {
   border-right: 1px solid var(--border);
+}
 
-  @media (max-width: 1024px) {
+@media (max-width: 1024px) {
+  #docs {
     border-right: none;
     border-bottom: 1px solid var(--border);
   }
 }
+
+/* ==========================================================================
+   NEXT STEPS LINKS
+   ========================================================================== */
 
 #next-steps ul {
   list-style: none;
@@ -110,75 +465,220 @@
   display: flex;
   gap: 8px;
   margin: 32px 0 0;
+}
 
-  .logo {
-    height: 18px;
-  }
+#next-steps ul .logo {
+  height: 18px;
+}
 
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
+#next-steps ul a {
+  color: var(--text-h);
+  font-size: 16px;
+  border-radius: 6px;
+  background: var(--social-bg);
+  display: flex;
+  padding: 6px 12px;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: box-shadow 0.3s;
+}
 
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
+#next-steps ul a:hover {
+  box-shadow: var(--shadow);
+}
 
-  @media (max-width: 1024px) {
+#next-steps ul a .button-icon {
+  height: 18px;
+  width: 18px;
+}
+
+@media (max-width: 1024px) {
+  #next-steps ul {
     margin-top: 20px;
     flex-wrap: wrap;
     justify-content: center;
+  }
 
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
+  #next-steps ul li {
+    flex: 1 1 calc(50% - 8px);
+  }
 
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
+  #next-steps ul a {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
   }
 }
+
+/* ==========================================================================
+   SPACER
+   ========================================================================== */
 
 #spacer {
   height: 88px;
   border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
+}
+
+@media (max-width: 1024px) {
+  #spacer {
     height: 48px;
   }
 }
 
+/* ==========================================================================
+   TICKS
+   ========================================================================== */
+
 .ticks {
   position: relative;
   width: 100%;
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+.ticks::before,
+.ticks::after {
+  content: "";
+  position: absolute;
+  top: -4.5px;
+  border: 5px solid transparent;
+}
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+.ticks::before {
+  left: 0;
+  border-left-color: var(--border);
+}
+
+.ticks::after {
+  right: 0;
+  border-right-color: var(--border);
+}
+/* ==========================================================================
+   SCROLL EXPAND COMPONENT STYLES & LIGHT MODE FIX
+   ========================================================================== */
+
+.scroll-expand {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.scroll-expand--scroller {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+}
+
+.scroll-expand--scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-expand__track {
+  position: relative;
+  width: 100%;
+}
+
+.scroll-expand__stage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  overflow: hidden;
+  --se-title-size: 4rem;
+}
+
+.scroll-expand__frame {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(33.5% 24% 33.5% 24% round 80px);
+  will-change: clip-path;
+}
+
+.scroll-expand__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.scroll-expand__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.1) 45%, rgba(0, 0, 0, 0.35));
+  opacity: 0;
+}
+
+.scroll-expand__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6%;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.scroll-expand__title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0 6%;
+  text-align: center;
+  font-size: var(--se-title-size);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.scroll-expand__hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1.25rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+/* Light variant (White Mode) + Background fix matching Section 1 (#f6efe4) */
+.scroll-expand--light,
+.scroll-expand--light .scroll-expand__stage {
+  background-color: #f6efe4 !important;
+}
+
+.scroll-expand--light .scroll-expand__scrim {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.35) 45%, rgba(255, 255, 255, 0.55));
+}
+
+.scroll-expand--light .scroll-expand__title,
+.scroll-expand--light .scroll-expand__hint {
+  color: #16161a;
+  text-shadow: none;
+}
+
+.scroll-expand--light .scroll-expand__hint {
+  color: rgba(22, 22, 26, 0.55);
+}
+
+.scroll-expand--light .scroll-expand__overlay {
+  color: #16161a;
 }
