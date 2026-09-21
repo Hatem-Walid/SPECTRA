@@ -1,45 +1,23 @@
 import { useState } from 'react';
 import ScrollExpand from './Components/ScrollExpand';
+import Dashboard from './pages/Dashboard'; // استيراد صفحة الداشبورد الحقيقية
 
 function App() {
   const [showDashboard, setShowDashboard] = useState(false);
 
-  // دالة الانتقال للداشبورد
+  // دالة الانتقال للداشبورد عند الضغط على أي زرار "start now"
   const handleOpenDashboard = (e) => {
     e.preventDefault();
     setShowDashboard(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // لو المستخدم ضغط على زرار يرجع للرئيسية
-  const handleBackToHome = (e) => {
-    e.preventDefault();
-    setShowDashboard(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // لو المتصفح في وضع الداشبورد
+  // لو المستخدم اختار يفتح الداشبورد، اعرض مكون الـ Dashboard
   if (showDashboard) {
-    return (
-      <div className="app-shell">
-        <div className="panel">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-            <h1 style={{ fontFamily: 'var(--font-serif)', color: 'var(--text-primary)' }}>Spectra Dashboard</h1>
-            <button onClick={handleBackToHome} className="btn-ghost">
-              ← Back to Home
-            </button>
-          </div>
-          
-          <div style={{ padding: '3rem', background: 'var(--surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
-            <h2 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Welcome to Spectra Console</h2>
-            <p style={{ color: 'var(--text-muted)' }}>Here you can manage your AI models, computer vision tasks, and predictive healthcare analytics.</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <Dashboard />;
   }
 
-  // صفحة الهبوط (Landing Page الافتراضية)
+  // صفحة الهبوط (Landing Page)
   return (
     <div>
       <nav className="nav">
