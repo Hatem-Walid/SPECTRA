@@ -1,18 +1,56 @@
+import { useState } from 'react';
 import ScrollExpand from './Components/ScrollExpand';
 
 function App() {
+  const [showDashboard, setShowDashboard] = useState(false);
+
+  // دالة الانتقال للداشبورد
+  const handleOpenDashboard = (e) => {
+    e.preventDefault();
+    setShowDashboard(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // لو المستخدم ضغط على زرار يرجع للرئيسية
+  const handleBackToHome = (e) => {
+    e.preventDefault();
+    setShowDashboard(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // لو المتصفح في وضع الداشبورد
+  if (showDashboard) {
+    return (
+      <div className="app-shell">
+        <div className="panel">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <h1 style={{ fontFamily: 'var(--font-serif)', color: 'var(--text-primary)' }}>Spectra Dashboard</h1>
+            <button onClick={handleBackToHome} className="btn-ghost">
+              ← Back to Home
+            </button>
+          </div>
+          
+          <div style={{ padding: '3rem', background: 'var(--surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+            <h2 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Welcome to Spectra Console</h2>
+            <p style={{ color: 'var(--text-muted)' }}>Here you can manage your AI models, computer vision tasks, and predictive healthcare analytics.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // صفحة الهبوط (Landing Page الافتراضية)
   return (
     <div>
       <nav className="nav">
         <div className="nav__brand">Spectra</div>
         <div className="nav__links">
-          <a href="#dashboard">start now</a>
+          <a href="#dashboard" onClick={handleOpenDashboard}>start now</a>
         </div>
       </nav>
 
       {/* ============================================================
-          SECTION 1 — static heading + tags, shown first, right
-          under the nav. Plain flow, no scroll-pin.
+          SECTION 1 — EDITORIAL SECTION
          ============================================================ */}
       <section className="editorial-section" id="approach">
         <div className="editorial-heading">
@@ -28,8 +66,7 @@ function App() {
       </section>
 
       {/* ============================================================
-          SECTION 2 — ScrollExpand hero video (White Mode Applied)
-          Starts small, expands to full-bleed as you scroll with light theme.
+          SECTION 2 — ScrollExpand hero video (White Mode)
          ============================================================ */}
       <ScrollExpand
         className="scroll-expand--light"
@@ -47,15 +84,15 @@ function App() {
         <div className="overlay-cta editorial-heading">
           <h2>Every pixel, everywhere</h2>
           <span className="editorial-text">The frame opens up as you scroll and hands the whole stage to your media.</span>
-           <br />
-           <a href="#dashboard" className="cta-button cta-button--light editorial-text">
+          <br />
+          <a href="#dashboard" className="cta-button" onClick={handleOpenDashboard}>
             start now
           </a>
         </div>
       </ScrollExpand>
 
       {/* ============================================================
-          SECTION 3 — full-bleed image-grid showcase
+          SECTION 3 — SHOWCASE
          ============================================================ */}
       <section className="showcase" id="showcase">
         <div className="showcase__grid" aria-hidden="true">
@@ -89,7 +126,7 @@ function App() {
             <span className="showcase__trust-text">Spectra is trusted by 8000+</span>
           </div>
 
-          <a href="#dashboard" className="showcase__cta">
+          <a href="#dashboard" className="showcase__cta" onClick={handleOpenDashboard}>
             Explore Spectra →
           </a>
         </div>
