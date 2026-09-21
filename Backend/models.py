@@ -21,11 +21,14 @@ INTRUSION_MODEL_PATH = os.path.join(SAVED_MODELS_DIR, "best_rf_pipeline.joblib")
 LEAF_MODEL_PATH = os.path.join(SAVED_MODELS_DIR, "leaf_model.keras")
 
 _LEAF_CLASSES = [
-    "Bacterial Spot",
-    "Downy Mildew",
+    "Bacterial",
+    "Downy_mildew_on_lettuce",
     "Healthy",
-    "Powdery Mildew",
-    "Septoria Leaf Spot",
+    "Powdery_mildew_on_lettuce",
+    "Septoria_blight_on_lettuce",
+    "Shepherd_purse_weeds",
+    "Viral",
+    "Wilt_and_leaf_blight_on_lettuce",
 ]
 
 _INSURANCE_FEATURE_ORDER = ["age", "sex", "bmi", "children", "smoker", "region"]
@@ -58,10 +61,6 @@ _insurance_model = None
 _intrusion_model = None
 _leaf_model = None
 
-
-# ---------------------------------------------------------------------------
-# Load functions (Strict Check)
-# ---------------------------------------------------------------------------
 
 def load_insurance_model():
     global _insurance_preprocessor, _insurance_model
@@ -109,10 +108,9 @@ def load_leaf_model():
     global _leaf_model
     if _leaf_model is None:
         if not os.path.exists(LEAF_MODEL_PATH):
-            # إيقاف التلييس: رمي خطأ صريح لو الموديل مش موجود
             raise HTTPException(
                 status_code=503,
-                detail="Leaf disease model is not available! File 'leaf_model.h5' was not found in 'saved_models/' directory."
+                detail="Leaf disease model is not available! File 'leaf_model.keras' was not found in 'saved_models/' directory."
             )
         try:
             from tensorflow import keras
@@ -122,10 +120,6 @@ def load_leaf_model():
 
     return _leaf_model
 
-
-# ---------------------------------------------------------------------------
-# Predict functions
-# ---------------------------------------------------------------------------
 
 def predict_insurance(payload) -> float:
     preprocessor, model = load_insurance_model()
@@ -223,7 +217,6 @@ def predict_intrusion_from_csv(file_bytes: bytes) -> dict:
 
 
 def predict_leaf(image_bytes: bytes) -> tuple[str, float, list[dict]]:
-    """فحص أمراض أوراق النبات — لا تلييس: يرمي خطأ صريح لو الموديل غير موجود"""
     model = load_leaf_model()
 
     try:
@@ -232,9 +225,10 @@ def predict_leaf(image_bytes: bytes) -> tuple[str, float, list[dict]]:
         raise HTTPException(status_code=400, detail="Corrupted or invalid image file. Please upload a valid image.")
 
     try:
-        target_size = model.input_shape[1:3] if hasattr(model, "input_shape") and model.input_shape[1] else (224, 224)
+        target_size = model.input_shape[1:3] if hasattr(model, "input_shape") and model.input_shape[1] else (220, 220)
         image = image.resize(target_size)
-        array = np.asarray(image, dtype=np.float32) / 255.0
+
+        array = np.asarray(image, dtype=np.float32)
         batch = np.expand_dims(array, axis=0)
 
         probs = model.predict(batch, verbose=0)[0]
@@ -242,7 +236,6 @@ def predict_leaf(image_bytes: bytes) -> tuple[str, float, list[dict]]:
 
         top_label, top_confidence = ranked[0]
         top_3 = [{"label": label, "confidence": float(conf)} for label, conf in ranked[:3]]
-
         return str(top_label), float(top_confidence), top_3
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Neural network prediction failed: {str(e)}")

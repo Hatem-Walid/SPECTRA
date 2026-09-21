@@ -1,14 +1,10 @@
-// الكود يختار السيرفر أوتوماتيكياً حسب مكان التشغيل:
 const FASTAPI_URL = import.meta.env.DEV
-  ? "http://localhost:8000"                             // 💻 يشتغل على الكمبيوتر المحلي تلقائياً
-  : "https://spectra-production-a64d.up.railway.app";    // 🌐 يشتغل على السيرفر الأونلاين تلقائياً
-// قراءة المفتاح بأمان من ملف .env
+  ? "http://localhost:8000"
+  : "https://spectra-production-a64d.up.railway.app";
+
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
 
-// ============================================================
-// قائمة الأعمدة وقالب الـ 41 فيتشر لموديل الاختراق (NSL-KDD)
-// ============================================================
 const _INTRUSION_COLUMNS = [
   "duration", "protocol_type", "service", "flag", "src_bytes",
   "dst_bytes", "land", "wrong_fragment", "urgent", "hot",
@@ -38,13 +34,9 @@ const NSL_KDD_41_TEMPLATE = {
   dst_host_srv_serror_rate: 0.0, dst_host_rerror_rate: 0.0, dst_host_srv_rerror_rate: 0.0
 };
 
-// ============================================================
-// محرك استخراج البيانات الهجين (بدون أي نتائج فيك)
-// ============================================================
 export async function extractFields(tool, conversation, existingData = {}) {
   const lastUserMsg = (conversation[conversation.length - 1]?.content || "").trim();
 
-  // 1. فحص هل المدخل JSON صريح
   try {
     const parsed = JSON.parse(lastUserMsg);
     return {
@@ -54,26 +46,47 @@ export async function extractFields(tool, conversation, existingData = {}) {
     };
   } catch {}
 
-  // 2. إذا قام المستخدم بلصق سطر CSV في شات الاختراق مباشرة، نفككه بدقة بدل تجاهله
-  if (tool === "intrusion" && lastUserMsg.includes(",")) {
-    const lines = lastUserMsg.split("\n").filter(l => l.trim() && !l.toLowerCase().startsWith("duration"));
-    if (lines.length > 0) {
-      const values = lines[0].split(",").map(v => v.trim());
-      if (values.length >= 10) {
-        const parsedCsv = {};
-        _INTRUSION_COLUMNS.forEach((col, idx) => {
-          if (values[idx] !== undefined) parsedCsv[col] = values[idx];
+  // استخراج وتحليل بيانات ملف الـ CSV المرفوع بدقة بعد التعديل
+  if (tool === "intrusion" && (lastUserMsg.includes(",") || lastUserMsg.includes("using row"))) {
+    let rawCsvLine = "";
+    if (lastUserMsg.includes("using row")) {
+      const parts = lastUserMsg.split(":");
+      rawCsvLine = parts.slice(3).join(":").trim();
+    } else {
+      const lines = lastUserMsg.split(/\r?\n/).filter(l => l.trim() && !l.toLowerCase().startsWith("duration"));
+      if (lines.length > 0) rawCsvLine = lines[0];
+    }
+
+    if (rawCsvLine) {
+      const parsedCsv = {};
+      if (rawCsvLine.includes(":")) {
+        const pairs = rawCsvLine.split(",");
+        pairs.forEach(pair => {
+          const [key, val] = pair.split(":").map(s => s.trim());
+          if (key && val !== undefined) {
+            parsedCsv[key] = !isNaN(val) && val !== "" ? Number(val) : val;
+          }
         });
+      } else {
+        const values = rawCsvLine.split(",").map(v => v.trim());
+        _INTRUSION_COLUMNS.forEach((col, idx) => {
+          if (values[idx] !== undefined) {
+            const val = values[idx];
+            parsedCsv[col] = !isNaN(val) && val !== "" ? Number(val) : val;
+          }
+        });
+      }
+
+      if (Object.keys(parsedCsv).length > 0) {
         return {
           ready: true,
           data: { ...existingData, ...parsedCsv },
-          reply: "Parsed pasted packet parameters! Sending to model..."
+          reply: "Parsed CSV data successfully! Sending packet to model..."
         };
       }
     }
   }
 
-  // 3. المحاولة عبر Gemini إذا كان المفتاح متوفراً
   if (GEMINI_KEY) {
     try {
       const systemInstruction = `
@@ -82,22 +95,10 @@ Tool: "${tool}".
 Already known data: ${JSON.stringify(existingData)}.
 Target for "insurance": age (int), sex ("male"|"female"), bmi (float), children (int), smoker ("yes"|"no"), region ("southwest"|"southeast"|"northwest"|"northeast").
 Target for "intrusion": any network packet features.
-
-Rules:
-1. Merge new user info with known data.
-2. If all required fields for "${tool}" are complete:
-   Return JSON: {"ready": true, "data": {...}, "reply": "All details received! Running model..."}
-3. If still missing fields:
-   Return JSON: {"ready": false, "data": {...}, "reply": "Friendly message asking specifically for missing fields."}
 Respond ONLY with valid JSON.`;
 
       const payload = {
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: `${systemInstruction}\nUser message: "${lastUserMsg}"` }]
-          }
-        ],
+        contents: [{ role: "user", parts: [{ text: `${systemInstruction}\nUser message: "${lastUserMsg}"` }] }],
         generationConfig: { responseMimeType: "application/json", temperature: 0.2 }
       };
 
@@ -122,7 +123,6 @@ Respond ONLY with valid JSON.`;
     }
   }
 
-  // 4. المستخرج المحلي الصارم
   return runLocalMemoryExtraction(tool, lastUserMsg, existingData);
 }
 
@@ -139,7 +139,7 @@ function runLocalMemoryExtraction(tool, text, existingData) {
 
     const kidsMatch = lower.match(/(\d+)\s*(?:kids?|children|child)/) || lower.match(/children[:\s]+(\d+)/);
     if (kidsMatch) merged.children = parseInt(kidsMatch[1], 10);
-    else if (lower.includes("no kid") || lower.includes("no child") || lower.includes("zero kid")) merged.children = 0;
+    else if (lower.includes("no kid") || lower.includes("no child")) merged.children = 0;
 
     const sexMatch = lower.match(/\b(male|female)\b/);
     if (sexMatch) merged.sex = sexMatch[0];
@@ -158,46 +158,29 @@ function runLocalMemoryExtraction(tool, text, existingData) {
     if (!merged.bmi) missing.push("BMI");
     if (merged.children === undefined) missing.push("Children count");
     if (!merged.smoker) missing.push("Smoker (yes/no)");
-    if (!merged.region) missing.push("Region (e.g. northwest)");
+    if (!merged.region) missing.push("Region");
 
     if (missing.length === 0) {
-      return {
-        ready: true,
-        data: merged,
-        reply: "All details collected! Calculating insurance charges..."
-      };
+      return { ready: true, data: merged, reply: "All details collected! Calculating insurance charges..." };
     } else {
-      return {
-        ready: false,
-        data: merged,
-        reply: `Please provide the remaining info: ${missing.join(", ")}.`
-      };
+      return { ready: false, data: merged, reply: `Please provide the remaining info: ${missing.join(", ")}.` };
     }
   }
 
   if (tool === "intrusion") {
-    // صارم: لا نرسل باكت سليم فيك لو المستخدم كتب كلاماً غير مفهوم
     const hasData = existingData && Object.keys(existingData).length > 0;
     if (!hasData) {
       return {
         ready: false,
         data: {},
-        reply: "⚠️ No valid packet features recognized. Please paste parameters in JSON format or select a sample from quick commands (⚡)."
+        reply: "⚠️ No valid packet features recognized. Please upload a CSV file or select a sample from quick commands (⚡)."
       };
     }
-    return {
-      ready: true,
-      data: existingData,
-      reply: "Running intrusion classification..."
-    };
+    return { ready: true, data: existingData, reply: "Running intrusion classification..." };
   }
 
   return { ready: false, data: existingData, reply: "Please provide valid inputs." };
 }
-
-// ============================================================
-// استدعاءات سيرفر FastAPI (تمرير الأخطاء الصريحة)
-// ============================================================
 
 export async function checkHealth() {
   const res = await fetch(`${FASTAPI_URL}/health`);
@@ -259,7 +242,6 @@ export async function predictIntrusion(data = {}) {
 
 export async function predictLeafDisease(file) {
   if (!file) throw new Error("No image file provided.");
-
   const formData = new FormData();
   formData.append("file", file);
 
@@ -270,7 +252,6 @@ export async function predictLeafDisease(file) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    // إظهار الخطأ الصادر من السيرفر كرسالة حمراء صريحة
     throw new Error(err.detail || "Leaf model prediction failed on the server.");
   }
 
