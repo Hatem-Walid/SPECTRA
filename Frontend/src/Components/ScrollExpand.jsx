@@ -41,6 +41,7 @@ const ScrollExpand = ({
   const overlayRef = useRef(null);
   const scrimRef = useRef(null);
   const hintRef = useRef(null);
+  const ringRef = useRef(null);
 
   const propsRef = useRef({});
   propsRef.current = {
@@ -71,6 +72,13 @@ const ScrollExpand = ({
     const iy = Math.max(0, (100 - h) / 2);
     const r = c.startRadius + (c.endRadius - c.startRadius) * e;
     frame.style.clipPath = `inset(${iy}% ${ix}% ${iy}% ${ix}% round ${r}px)`;
+
+    if (ringRef.current) {
+      const ring = ringRef.current.style;
+      ring.inset = `${iy}% ${ix}%`;
+      ring.borderRadius = `${r}px`;
+      ring.opacity = `${1 - smoothstep(0.05, 0.55, p)}`;
+    }
 
     media.style.transform = `scale(${c.mediaZoom + (1 - c.mediaZoom) * e})`;
 
@@ -219,6 +227,7 @@ const ScrollExpand = ({
               </div>
             ) : null}
           </div>
+          <div ref={ringRef} className="scroll-expand__ring" />
           {title ? (
             <div ref={titleRef} className="scroll-expand__title">
               {title}
